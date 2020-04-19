@@ -31,6 +31,7 @@ sns.set_context('poster')
 
 
 working_dir = '../data'
+figure_dir = '../figures'
 working_data = glob(os.path.join(working_dir,
                                  '*-epo.fif'))
 
@@ -157,7 +158,7 @@ score,purms,pval = permutation_test_score(estimator = pipeline,
                                           verbose = 1,
                                           )
 
-fig,axes = plt.subplots(figsize = (8,12),ncols = 1)
+fig,axes = plt.subplots(figsize = (8,12),nrows = 2)
 ax = axes[0]
 ax.hist(purms,color = 'blue',)
 ax.axvline(res['test_score'].mean(),
@@ -199,7 +200,10 @@ ax.axvline(res['test_score'].mean(),
 ax.legend()
 ax.set(title = 'leave one subject out, cross subject validation')
 
-
+fig.savefig(os.path.join(figure_dir,
+                         'decoding MEG using all the information, random shuffling vs LOO.jpeg'),
+            dpi = 300,
+            bbox_inches = 'tight')
 
 
 
