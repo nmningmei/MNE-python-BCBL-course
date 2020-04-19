@@ -22,8 +22,13 @@ from glob import glob
 import mne
 
 import numpy as np
+import seaborn as sns
 
 from sklearn.utils import shuffle as sk_shuffle
+from matplotlib import pyplot as plt
+
+sns.set_context('poster')
+
 
 working_dir = '../data'
 working_data = glob(os.path.join(working_dir,
@@ -141,6 +146,7 @@ res = cross_validate(estimator = pipeline,
                      )
 print(res['test_score'])
 gc.collect()
+# this takes 20 mins to run
 score,purms,pval = permutation_test_score(estimator = pipeline,
                                           X = features,
                                           y = np.array(labels == 1, dtype = int),
@@ -151,12 +157,47 @@ score,purms,pval = permutation_test_score(estimator = pipeline,
                                           verbose = 1,
                                           )
 
+fig,axes = plt.subplots(figsize = (8,12),ncols = 1)
+ax = axes[0]
+ax.hist(purms,color = 'blue',)
+ax.axvline(res['test_score'].mean(),
+           linestyle = '--',
+           color = 'black',
+           label = f'score = {res["test_score"].mean():.3f} +/- {res["test_score"].std():.3f}')
+ax.legend()
+ax.set(title = 'random 10-fold cross validation')
 
-
-
-
-
-
+## switch to leave-one-subject-out
+cv = LeaveOneGroupOut()
+res = cross_validate(estimator = pipeline,
+                     X = features,
+                     y = np.array(labels == 1,dtype = int),
+                     groups = groups,
+                     scoring = 'roc_auc',
+                     cv = cv,
+                     n_jobs = -1,
+                     verbose = 1, 
+                     # return_estimator = True,
+                     )
+print(res['test_score'])
+gc.collect()
+score,purms,pval = permutation_test_score(estimator = pipeline,
+                                          X = features,
+                                          y = np.array(labels == 1, dtype = int),
+                                          groups = groups,
+                                          scoring = 'roc_auc',
+                                          cv = cv,
+                                          n_jobs = -1,
+                                          verbose = 1,
+                                          )
+ax = axes[1]
+ax.hist(purms,color = 'blue',)
+ax.axvline(res['test_score'].mean(),
+           linestyle = '--',
+           color = 'black',
+           label = f'score = {res["test_score"].mean():.3f} +/- {res["test_score"].std():.3f}')
+ax.legend()
+ax.set(title = 'leave one subject out, cross subject validation')
 
 
 
