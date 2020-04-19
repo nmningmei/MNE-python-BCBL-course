@@ -29,6 +29,7 @@ import seaborn as sns
 
 from sklearn.utils import shuffle as sk_shuffle
 from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 sns.set_context('poster')
 
@@ -161,7 +162,7 @@ random_shuffle = scores_gen.copy()
 
 fig,axes = plt.subplots(figsize = (8,12),nrows = 2,)
 ax = axes[0]
-im = ax.imshow(scores_gen.mean(0),
+im1 = ax.imshow(scores_gen.mean(0),
                origin = 'lower',
                cmap = plt.cm.RdBu_r,
                vmin = .2, 
@@ -169,7 +170,9 @@ im = ax.imshow(scores_gen.mean(0),
                aspect = 'auto',
                extent = [tmin,tmax,tmin,tmax],
                )
-cbar = plt.colorbar(im)
+divider = make_axes_locatable(ax)
+cax = divider.append_axes('right',size = "5%",pad = 0.05)
+fig.colorbar(im1,cax = cax,orientation = 'vertical')
 ax.set(xlabel = 'Testing Time (s)',
        ylabel = 'Training Time (s)',
        title = 'random 10-fold cross validation')
@@ -186,7 +189,7 @@ scores_gen = cross_val_multiscore(estimator = time_gen,
                                   )
 loo = scores_gen.copy()
 ax = axes[1]
-im = ax.imshow(scores_gen.mean(0),
+im2 = ax.imshow(scores_gen.mean(0),
                origin = 'lower',
                cmap = plt.cm.RdBu_r,
                vmin = .2, 
@@ -194,7 +197,9 @@ im = ax.imshow(scores_gen.mean(0),
                aspect = 'auto',
                extent = [tmin,tmax,tmin,tmax],
                )
-cbar = plt.colorbar(im)
+divider = make_axes_locatable(ax)
+cax = divider.append_axes('right',size = "5%",pad = 0.05)
+fig.colorbar(im2,cax = cax,orientation = 'vertical')
 ax.set(xlabel = 'Testing Time (s)',
        ylabel = 'Training Time (s)',
        title = 'leave one subject out cross subject validation')
